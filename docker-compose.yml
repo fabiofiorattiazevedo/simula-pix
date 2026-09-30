@@ -1,0 +1,69 @@
+# =============================================================================
+# Docker Compose — PIX Payment API (desenvolvimento local)
+# Uso: docker compose up -d
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Serviço: backend — aplicação Node.js/Express
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .          # raiz do projeto (onde está o Dockerfile)
+      dockerfile: Dockerfile
+    container_name: pix_backend
+    ports:
+      - "3000:3000"       # host:container
+    volumes:
+      - .:/app            # hot reload: mapeia o código local para dentro do container
+      - /app/node_modules # volume anônimo para preservar o node_modules do container
+    env_file:
+      - .env              # carrega todas as variáveis do arquivo .env
+    environment:
+      # Sobrescreve a URI do MongoDB para apontar ao serviço "mongo" dentro da rede Docker
+      - MONGODB_URI=mongodb://mongo:27017/pix_api
+      - NODE_ENV=development
+    depends_on:
+      mongo:
+        condition: service_healthy  # aguarda o MongoDB estar pronto antes de iniciar
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Serviço: mongo — banco de dados MongoDB
+  # ---------------------------------------------------------------------------
+  mongo:
+    image: mongo:7-jammy
+    container_name: pix_mongo
+    ports:
+      - "27017:27017"     # expõe para ferramentas locais (ex: Compass, mongosh)
+    volumes:
+      - mongo_data:/data/db   # volume nomeado para persistir os dados entre reinicializações
+    environment:
+      - MONGO_INITDB_DATABASE=pix_api
+    healthcheck:
+      # Verifica se o MongoDB aceita conexões antes de liberar o backend
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s       # checa a cada 10 segundos
+      timeout: 5s         # aguarda até 5s por resposta
+      retries: 5          # tenta 5 vezes antes de marcar como unhealthy
+      start_period: 20s   # tempo de carência para o mongo iniciar pela primeira vez
+    networks:
+      - app-network
+    restart: unless-stopped
+
+# =============================================================================
+# Volumes nomeados — dados persistidos além do ciclo de vida dos containers
+# =============================================================================
+volumes:
+  mongo_data:
+    driver: local
+
+# =============================================================================
+# Rede customizada — isola a comunicação entre os serviços
+# =============================================================================
+networks:
+  app-network:
+    driver: bridge
