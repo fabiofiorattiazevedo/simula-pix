@@ -90,7 +90,7 @@ async function enviarPix({ chave, valor, descricao }, agora = new Date()) {
   const LIMITE_DIARIO  = Number(process.env.PIX_LIMITE_DIARIO)  || 10000;
   const LIMITE_NOTURNO = Number(process.env.PIX_LIMITE_NOTURNO) || 1000;
   const hora = agora.getHours();
-  const isNoturno = hora >= 20 || hora < 6;
+  const isNoturno = hora > 20 || hora < 6;
   const limite = isNoturno ? LIMITE_NOTURNO : LIMITE_DIARIO;
 
   if (valor > limite) {

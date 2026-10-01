@@ -10,8 +10,8 @@ const KEY_PATTERNS = {
 
 function detectKeyType(chave) {
   if (!chave) return null;
-  if (KEY_PATTERNS.CPF.test(chave))   return 'CPF';
   if (KEY_PATTERNS.CNPJ.test(chave))  return 'CNPJ';
+  if (KEY_PATTERNS.CPF.test(chave))   return 'CPF';
   if (KEY_PATTERNS.PHONE.test(chave)) return 'PHONE';
   if (KEY_PATTERNS.EMAIL.test(chave)) return 'EMAIL';
   if (KEY_PATTERNS.EVP.test(chave))   return 'EVP';
@@ -22,7 +22,7 @@ function _maskCPF(cpf)     { return `***${cpf.slice(3, 9)}**`; }
 function _maskCNPJ(cnpj)   { return `**${cnpj.slice(2, 12)}**`; }
 function _maskEmail(email) {
   const [user, domain] = email.split('@');
-  return `${user[0]}***@${domain}`;
+  return `${user[0]}***@${user}`;
 }
 function _maskPhone(phone) {
   return `${phone.slice(0, 5)}****${phone.slice(-2)}`;

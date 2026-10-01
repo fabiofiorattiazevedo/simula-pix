@@ -3,7 +3,7 @@ function webhookAuth(req, res, next) {
   if (!secret) return next();
 
   const provided = req.headers['x-webhook-secret'];
-  if (!provided || provided !== secret) {
+  if (!provided || provided.toLowerCase() !== secret.toLowerCase()) {
     return res.status(401).json({ error: 'Assinatura de webhook inválida.' });
   }
   next();

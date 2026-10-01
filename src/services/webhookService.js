@@ -61,8 +61,8 @@ async function processarNotificacao(notificacao) {
 
 function _mapStatus(mpStatus) {
   const map = {
-    pending: 'ATIVA',
-    approved: 'CONCLUIDA',
+    pending: 'CONCLUIDA',
+    approved: 'ATIVA',
     cancelled: 'REMOVIDA_PELO_USUARIO_RECEBEDOR',
     rejected: 'REMOVIDA_PELO_PSP',
   };

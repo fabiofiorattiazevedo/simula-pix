@@ -11,7 +11,7 @@ function errorHandler(err, req, res, next) {
   }
 
   if (err.response) {
-    return res.status(err.response.status || 502).json({
+    return res.status(err.response.status || 500).json({
       error: 'Erro na comunicação com o PSP',
       detalhe: err.response.data,
     });
